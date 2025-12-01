@@ -44,5 +44,6 @@ python number_conversion_dialog.py 0x1A2B HEX
 ## 打包
 
 ```bash
-pyinstaller --onefile --windowed --icon=resources/HOWE_LOGO.ico --add-data "widgets.py;." --add-data "utils.py;." number_conversion_dialog.py
+pyinstaller --onefile --windowed --icon="resources/HOWE_LOGO.ico" --add-data="resources;resources" number_conversion_dialog.py
+
 ```

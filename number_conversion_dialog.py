@@ -31,7 +31,7 @@ class NumberConversionDialog(QDialog):
         # 独立运行时设置窗口标题
         if parent is None:
             self.setWindowTitle("数字进制转换计算器_GHowe")
-            self.setWindowIcon(QIcon(resource_path("HOWE_LOGO.ico")))
+            self.setWindowIcon(QIcon(resource_path("resources/HOWE_LOGO.ico")))
         else:
             if conversion_type == "HEX":
                 self.setWindowTitle("HEX 计算_GHowe")
@@ -141,7 +141,7 @@ class NumberConversionDialog(QDialog):
         for row in range(4):  # 4行
             row_widget = QWidget()
             row_layout = QHBoxLayout(row_widget)
-            row_layout.setSpacing(10)  # 增大组间间距
+            row_layout.setSpacing(1)  # 减小组间间距
             row_layout.setContentsMargins(0, 0, 0, 0)
 
             # 每行4组
@@ -150,10 +150,10 @@ class NumberConversionDialog(QDialog):
                 group_frame = QFrame()
                 group_frame.setFrameStyle(QFrame.Box)  # 添加边框
                 group_frame.setLineWidth(0)
-                group_frame.setFixedWidth(110)  # 固定宽度
+                group_frame.setFixedWidth(100)  # 固定宽度
                 group_layout = QHBoxLayout(group_frame)
-                group_layout.setSpacing(1)  # 减小组内间距
-                group_layout.setContentsMargins(0, 0, 0, 0)
+                group_layout.setSpacing(0)  # 减小组内间距
+                group_layout.setContentsMargins(1, 1, 1, 1)
 
                 # 在组内创建4个位按钮和标签
                 for bit_in_group in range(4):
@@ -232,24 +232,24 @@ class NumberConversionDialog(QDialog):
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
 
-        # 添加复制按钮
-        copy_buttons_layout = QHBoxLayout()
+        # 添加复制按钮 - 使用网格布局以节省空间
+        copy_buttons_layout = QGridLayout()
 
         copy_hex_btn = QPushButton("复制 HEX")
         copy_hex_btn.clicked.connect(lambda: self.copy_to_clipboard(self.hex_edit.text()))
-        copy_buttons_layout.addWidget(copy_hex_btn)
+        copy_buttons_layout.addWidget(copy_hex_btn, 0, 0)
 
         copy_dec_btn = QPushButton("复制 DEC")
         copy_dec_btn.clicked.connect(lambda: self.copy_to_clipboard(self.dec_edit.text()))
-        copy_buttons_layout.addWidget(copy_dec_btn)
+        copy_buttons_layout.addWidget(copy_dec_btn, 0, 1)
 
         copy_bin_btn = QPushButton("复制 BIN")
         copy_bin_btn.clicked.connect(lambda: self.copy_to_clipboard(self.bin_edit.text()))
-        copy_buttons_layout.addWidget(copy_bin_btn)
+        copy_buttons_layout.addWidget(copy_bin_btn, 1, 0)
 
         copy_oct_btn = QPushButton("复制 OCT")
         copy_oct_btn.clicked.connect(lambda: self.copy_to_clipboard(self.oct_edit.text()))
-        copy_buttons_layout.addWidget(copy_oct_btn)
+        copy_buttons_layout.addWidget(copy_oct_btn, 1, 1)
 
         layout.addLayout(copy_buttons_layout)
         layout.addWidget(button_box)
@@ -917,12 +917,12 @@ if __name__ == '__main__':
     # --- 参数解析 ---
     # 创建一个 ArgumentParser 对象
     parser = argparse.ArgumentParser(description="一个独立的数字进制转换工具。")
-    
+
     # 添加命令行参数
     # 第一个参数: selected_text, 是可选的位置参数
     parser.add_argument('selected_text', type=str, nargs='?', default="0x0",
                         help="要转换的初始数字文本 (例如, '123' 或 '0x7B')。")
-    
+
     # 第二个参数: conversion_type, 也是可选的位置参数
     parser.add_argument('conversion_type', type=str, nargs='?', default="HEX",
                         help="初始转换类型 ('HEX' 或 'DEC')。")
@@ -933,9 +933,9 @@ if __name__ == '__main__':
     # --- 启动应用 ---
     # 使对话框可以独立运行
     app = QApplication(sys.argv)
-    
+
     # 使用从命令行解析的参数创建对话框实例
     dialog = NumberConversionDialog(selected_text=args.selected_text, conversion_type=args.conversion_type)
     dialog.show()
-    
+
     sys.exit(app.exec_())

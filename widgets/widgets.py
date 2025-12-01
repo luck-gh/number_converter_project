@@ -16,7 +16,7 @@ class ExpandingTextEdit(QTextEdit):
         text = self.toPlainText()
         font_metrics = self.fontMetrics()
         text_width = font_metrics.width(text)
-        
+
         # 减去一个小的边距以获得更准确的宽度
         widget_width = self.width() - 10
 
@@ -37,14 +37,14 @@ class ExpandingTextEdit(QTextEdit):
         doc_height = self.document().size().height()
         # 获取单行文本的高度
         single_line_height = self.fontMetrics().height()
-        
+
         # 添加边距
         margins = self.contentsMargins()
         new_height = doc_height + margins.top() + margins.bottom()
 
         # 确保最小高度至少为一行
         min_height = single_line_height + margins.top() + margins.bottom() + 5
-        
+
         if new_height < min_height:
             new_height = min_height
 
