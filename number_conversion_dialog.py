@@ -11,18 +11,41 @@ from PyQt5.QtWidgets import (QApplication, QDialog, QVBoxLayout, QHBoxLayout,
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QFont, QIcon
 
-from widgets.widgets import ExpandingTextEdit
-from widgets.utils import resource_path
+try:
+    # 尝试作为包内模块导入 (当作为 number_converter_project.number_conversion_dialog 导入时)
+    from .widgets.widgets import ExpandingTextEdit
+    from .widgets.utils import resource_path
+except (ImportError, ValueError):
+    # 兼容直接导入或独立运行的情况
+    try:
+        from widgets.widgets import ExpandingTextEdit
+        from widgets.utils import resource_path
+    except ImportError:
+        try:
+            # 尝试通过全路径导入
+            from number_converter_project.widgets.widgets import ExpandingTextEdit
+            from number_converter_project.widgets.utils import resource_path
+        except ImportError:
+            # 最后的保底方案
+            import widgets.widgets as ww
+            import widgets.utils as wu
+            ExpandingTextEdit = ww.ExpandingTextEdit
+            resource_path = wu.resource_path
 
 class NumberConversionDialog(QDialog):
     """数字转换对话框 - 支持实时同步更新和复制功能, 包含内置位键盘"""
-    def __init__(self, selected_text="", conversion_type="HEX", parent=None):
+    def __init__(self, selected_text="", conversion_type="HEX", parent=None, data_width="DWORD"):
         super().__init__(parent)
-        self.selected_text = selected_text.strip() if "" != selected_text else selected_text
-        self.conversion_type = conversion_type
+        # 确保 selected_text 是字符串且安全处理 (防止信号传递布尔值)
+        if isinstance(selected_text, bool) or selected_text is None:
+            self.selected_text = ""
+        else:
+            self.selected_text = str(selected_text).strip()
+            
+        self.conversion_type = conversion_type if isinstance(conversion_type, str) else "HEX"
         self.updating = False  # 防止循环更新
         self.is_signed = False  # 默认为无符号模式
-        self.data_width = "DWORD"  # 默认32位
+        self.data_width = data_width
 
         # 位键盘相关属性
         self.bits = [0] * 64  # 64位数据, 初始全为0
@@ -927,6 +950,10 @@ if __name__ == '__main__':
     parser.add_argument('conversion_type', type=str, nargs='?', default="HEX",
                         help="初始转换类型 ('HEX' 或 'DEC')。")
 
+    # 第三个参数: data_width, 也是可选的位置参数
+    parser.add_argument('data_width', type=str, nargs='?', default="DWORD",
+                        help="初始数据宽度 ('QWORD', 'DWORD', 'WORD','BYTE')。")
+
     # 解析命令行传入的参数
     args = parser.parse_args()
 
@@ -935,7 +962,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     # 使用从命令行解析的参数创建对话框实例
-    dialog = NumberConversionDialog(selected_text=args.selected_text, conversion_type=args.conversion_type)
+    dialog = NumberConversionDialog(selected_text=args.selected_text, conversion_type=args.conversion_type, data_width=args.data_width)
     dialog.show()
 
     sys.exit(app.exec_())
